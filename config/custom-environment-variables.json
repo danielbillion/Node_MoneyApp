@@ -1,0 +1,4 @@
+{
+  "jwtPrivateKey": "moneyapp_jwtPrivateKey",
+  "db":"db_moneyapp"
+}
