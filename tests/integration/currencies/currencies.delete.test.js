@@ -2,46 +2,49 @@ const {User} = require('../../../models/user');
 const {Currency} = require('../../../models/currency');
 const request = require('supertest');
 const mongoose = require('mongoose');
-// POST api/rates
-    // Return 401 if user is not logged in 
-    // Return 400 if there is a missing Input property
-    // Return 200 if reques is valid
-   
-describe('POST  /api/currencies', ()=>{
+
+describe('DELETE  /api/currencies', ()=>{
         
     let server;  
     let token;
     let testData
     let id
+    let newCurrency;
     
 
   const exec = async () => {
     return await request(server)
-      .post('/api/currencies/')
+      .delete('/api/currencies/' + id)
       .set('x-auth-token', token)
-      .send(testData);
+      .send();
   };
+
+ 
 
  
   
   beforeEach(async () => { 
             server = require('../../../index'); 
-            id = mongoose.Types.ObjectId()
+            currencyId = mongoose.Types.ObjectId()
 
             token = new User({isAdmin:true}).generateAuthToken();
             
            
-            testData = 
-                { 
-                user_id:0,
-                origin:'United Kingdom',
-                origin_symbol:'UK',
-                destination:'Nigeria',
-                destination_symbol:'NG',
-                code:'UK-NG',
-                income_category:'commission'},
-            
-                new Currency(testData).save()
+                testData = { 
+                    _id:currencyId,
+                    user_id:0,
+                    origin:'United Kingdom',
+                    origin_symbol:'UK',
+                    destination:'Nigeria',
+                    destination_symbol:'NG',
+                    code:'UK-NG',
+                    income_category:'commission'
+                };
+                
+                newCurrency =  await new Currency(testData).save();
+                id = newCurrency._id
+              
+
         })
     
         afterEach(async () => { 
@@ -51,7 +54,7 @@ describe('POST  /api/currencies', ()=>{
         });  
 
 
-        describe('POST /', async () => {
+        describe('DELETE /:id', async () => {
             it('Should Return 401 if user is not logged in', async () => {
                     
                         token = '';
@@ -67,19 +70,26 @@ describe('POST  /api/currencies', ()=>{
                                 const res = await exec();
                     
                             expect(res.status).toBe(403)
-                        })
+             })
+
+             it('Should Return 404 if id is not valid', async () => {
+
+                id = 1;
+                const res = await exec();
+    
+            expect(res.status).toBe(404)
+            })
                     
-            it('Should Return 400 if any of post input is missing', async () => {   
-                            delete testData.user_id
-                           const res = await exec()
-                           expect(res.status).toBe(400)
-                   }) 
+           
                 
-            it('Should Return 200 if have a valid request', async () => {
-                   const res = await exec();
-                   expect(res.status).toBe(200);
-                  expect(res.body).toMatchObject(testData)
-                })   
+            it('Should Return 200 if id is valid & there is update', async () => {
+
+            
+                const res = await exec();
+                expect(res.status).toBe(200);
+                
+                expect(res.body).toHaveProperty('_id', newCurrency._id.toHexString());
+            })   
                 
                      
            })

@@ -50,7 +50,7 @@ currencySchema.statics.lookup = function(currencyId) {
 
 const Currency = mongoose.model('Currency', currencySchema)
 
-const validateCurrency = function(rate){
+const validateCurrency = function(currencies){
     
     schema = {
         user_id:Joi.number().required(),
@@ -62,7 +62,7 @@ const validateCurrency = function(rate){
         income_category:Joi.string().required(),
     }
 
-    return Joi.validate(rate,schema)
+    return Joi.validate(currencies,schema)
 }
 
 exports.Currency = Currency;
