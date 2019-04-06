@@ -69,8 +69,8 @@ describe('DELETE  /api/payments', ()=>{
                     it('Should Return 404 if id is not valid', async () => {
                     
                         id = 1;
-                            
                         const res = await exec();
+                        
                 
                         expect(res.status).toBe(404)
                     })
